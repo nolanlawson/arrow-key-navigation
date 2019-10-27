@@ -18,10 +18,10 @@ to add basic KaiOS accessibility ot an existing web app.
 ## Usage
 
 ```js
-const kaiosNavigation = require('dpad-navigation')
+const dpadNavigation = require('dpad-navigation')
 
-kaiosNavigation.register() // start listening for ←/→ key inputs
-kaiosNavigation.unregister() // stop listening
+dpadNavigation.register() // start listening for ←/→ key inputs
+dpadNavigation.unregister() // stop listening
 ```
 
 ## Focus traps
@@ -32,7 +32,7 @@ accomplish this, you can set a "focus trap test" which takes an element as input
 to indicate that the element is a focus trap (e.g. the modal dialog root):
 
 ```js
-kaiosNavigation.setFocusTrapTest(element => {
+dpadNavigation.setFocusTrapTest(element => {
   return element.classList.contains('my-dialog-class')
 })
 ```
