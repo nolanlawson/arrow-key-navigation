@@ -1,5 +1,5 @@
 {
-  "name": "kaios-navigation",
+  "name": "dpad-navigation",
   "version": "1.0.0",
   "description": "Add left/right keyboard navigation to a KaiOS app or website",
   "author": "Nolan Lawson <nolan@nolanlawson.com>",
@@ -8,13 +8,16 @@
     "kaios",
     "navigation",
     "accessibility",
-    "focus"
+    "focus",
+    "dpad",
+    "d-pad"
   ],
   "scripts": {
     "lint": "tslint ./src/**/*",
     "lint:fix": "tslint --fix ./src/**/*",
     "build": "pika-pack",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "mocha ./test/test.js"
   },
   "@pika/pack": {
     "pipeline": [
@@ -34,6 +37,10 @@
     "@pika/plugin-build-node": "^0.7.1",
     "@pika/plugin-build-web": "^0.7.1",
     "@pika/plugin-ts-standard-pkg": "^0.7.1",
+    "assert": "^2.0.0",
+    "jsdom": "^15.2.0",
+    "jsdom-global": "^3.0.2",
+    "mocha": "^6.2.2",
     "tslint": "^5.20.0",
     "tslint-config-standard": "^8.0.1",
     "typescript": "^3.6.4"

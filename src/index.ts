@@ -5,14 +5,14 @@
 interface FocusTrapTest { (element: Element): boolean }
 
 // via a11y-dialog
-var focusablesQuery = 'a[href] area[href] input select textarea ' +
-  'button iframe object embed [contenteditable] [tabindex]'
+var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
+  'button, iframe, object, embed, [contenteditable], [tabindex]'
 var textTypes = ['text', 'search', 'number', 'email', 'url']
 var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
 
-function getFocusableElements (activeElement) {
+function getFocusableElements(activeElement) {
   // Respect focus trap inside of dialogs
   var dialogParent = getFocusTrapParent(activeElement)
   var root = dialogParent || document
@@ -23,10 +23,9 @@ function getFocusableElements (activeElement) {
   var len = elements.length
   for (var i = 0; i < len; i++) {
     var element = elements[i]
-    if (element !== activeElement &&
-      !element.disabled &&
-      /^-/.test(element.getAttribute('tabindex') || '') &&
-      (element.offsetWidth > 0 || element.offsetHeight > 0)) {
+    if (element === activeElement || (
+        !element.disabled && !/^-/.test(element.getAttribute('tabindex') || '')
+    )) {
       res.push(element)
     }
   }
@@ -74,15 +73,13 @@ function focusNextOrPrevious (event, key) {
   if (shouldIgnoreEvent(activeElement, key)) {
     return
   }
-  var focusable = getFocusableElements(activeElement)
-  var index = focusable.indexOf(activeElement)
+  var focusableElements = getFocusableElements(activeElement)
+  var index = focusableElements.indexOf(activeElement)
   var element
   if (key === 'ArrowLeft') {
-    console.log('focus previous')
-    element = focusable[index - 1] || focusable[0]
+    element = focusableElements[index - 1] || focusableElements[0]
   } else { // ArrowRight
-    console.log('focus next')
-    element = focusable[index + 1] || focusable[focusable.length - 1]
+    element = focusableElements[index + 1] || focusableElements[focusableElements.length - 1]
   }
   element.focus()
   event.preventDefault()
