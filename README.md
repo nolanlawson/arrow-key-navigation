@@ -1,9 +1,9 @@
-dpad-naigationgation
+dpad-navigation
 =====
 
 ## Overview
 
-`dpad-naigationgation` is a simple utility to add left/right focus navigation to a web app. It's
+`dpad-navigation` is a simple utility to add left/right focus navigation to a web app. It's
 designed for KaiOS apps but also available for any browser.
 
 The basic idea is to make the <kbd>←</kbd> and <kbd>→</kbd> keys act similar to 
@@ -13,12 +13,12 @@ to add basic KaiOS accessibility ot an existing web app.
 
 ## Install
 
-    npm install --save dpad-naigationgation
+    npm install --save dpad-navigation
 
 ## Usage
 
 ```js
-const kaiosNavigation = require('dpad-naigationgation')
+const kaiosNavigation = require('dpad-navigation')
 
 kaiosNavigation.register() // start listening for ←/→ key inputs
 kaiosNavigation.unregister() // stop listening
@@ -37,5 +37,5 @@ kaiosNavigation.setFocusTrapTest(element => {
 })
 ```
 
-If you don't call `setFocusTrapTest()`, then `dpad-naigationgation` will assume that there are no focus traps
+If you don't call `setFocusTrapTest()`, then `dpad-navigation` will assume that there are no focus traps
 in your app.
