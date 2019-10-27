@@ -1,6 +1,8 @@
 {
-  "include": ["index.ts"],
+  "include": ["./src/index.ts"],
   "exclude": ["node_modules"],
-  "target": "es5",
-  "module": "esnext"
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "esnext"
+  }
 }

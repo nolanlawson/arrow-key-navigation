@@ -11,27 +11,31 @@
     "focus"
   ],
   "scripts": {
-    "lint": "tslint *.ts",
-    "lint:fix": "tslint --fix *.ts",
-    "build": "@pika/pack",
+    "lint": "tslint ./src/**/*",
+    "lint:fix": "tslint --fix ./src/**/*",
+    "build": "pika-pack",
     "prepare": "npm run build"
   },
   "@pika/pack": {
     "pipeline": [
       [
-        "@pika/plugin-ts-standard-pkg",
-        {}
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-node"
+      ],
+      [
+        "@pika/plugin-build-web"
       ]
     ]
   },
   "devDependencies": {
+    "@pika/pack": "^0.5.0",
+    "@pika/plugin-build-node": "^0.7.1",
+    "@pika/plugin-build-web": "^0.7.1",
     "@pika/plugin-ts-standard-pkg": "^0.7.1",
-    "standard": "^14.3.1",
     "tslint": "^5.20.0",
     "tslint-config-standard": "^8.0.1",
     "typescript": "^3.6.4"
-  },
-  "dependencies": {
-    "@pika/pack": "^0.5.0"
   }
 }

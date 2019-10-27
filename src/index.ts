@@ -20,7 +20,8 @@ function getFocusableElements (activeElement) {
   var res = []
   var elements = root.querySelectorAll(focusablesQuery)
 
-  for (var i = 0, len = elements.length; i < len; i++) {
+  var len = elements.length
+  for (var i = 0; i < len; i++) {
     var element = elements[i]
     if (element !== activeElement &&
       !element.disabled &&
@@ -56,8 +57,8 @@ function shouldIgnoreEvent (activeElement, key) {
     return false
   }
 
-  var selectionStart = activeElement.selectionStart;
-  var selectionEnd = activeElement.selectionEnd;
+  var selectionStart = activeElement.selectionStart
+  var selectionEnd = activeElement.selectionEnd
   // if the cursor is inside of a textarea/input, then don't focust to the next/previous element
   // unless the cursor is at the beginning or the end
   if (key === 'ArrowLeft' && selectionStart === selectionEnd && selectionStart === 0) {
@@ -69,7 +70,7 @@ function shouldIgnoreEvent (activeElement, key) {
 }
 
 function focusNextOrPrevious (event, key) {
-  var activeElement = document.activeElement;
+  var activeElement = document.activeElement
   if (shouldIgnoreEvent(activeElement, key)) {
     return
   }
@@ -89,7 +90,7 @@ function focusNextOrPrevious (event, key) {
 }
 
 function handleEnter (event) {
-  var activeElement = document.activeElement;
+  var activeElement = document.activeElement
   if (activeElement.tagName === 'INPUT' &&
     checkboxRadioInputTypes.indexOf(activeElement.getAttribute('type')) !== -1) {
     // Explicitly override "enter" on an input and make it fire the checkbox/radio
@@ -103,7 +104,7 @@ function keyListener (event) {
   if (event.altKey || event.metaKey || event.ctrlKey) {
     return // ignore e.g. Alt-Left and Ctrl-Right, which are used to switch browser tabs or navigate back/forward
   }
-  var key = event.key;
+  var key = event.key
   switch (key) {
     case 'ArrowLeft':
     case 'ArrowRight': {
