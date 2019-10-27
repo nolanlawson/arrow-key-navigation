@@ -1,0 +1,37 @@
+{
+  "name": "kaios-navigation",
+  "version": "1.0.0",
+  "description": "Add left/right keyboard navigation to a KaiOS app or website",
+  "author": "Nolan Lawson <nolan@nolanlawson.com>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "kaios",
+    "navigation",
+    "accessibility",
+    "focus"
+  ],
+  "scripts": {
+    "lint": "tslint *.ts",
+    "lint:fix": "tslint --fix *.ts",
+    "build": "@pika/pack",
+    "prepare": "npm run build"
+  },
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg",
+        {}
+      ]
+    ]
+  },
+  "devDependencies": {
+    "@pika/plugin-ts-standard-pkg": "^0.7.1",
+    "standard": "^14.3.1",
+    "tslint": "^5.20.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "@pika/pack": "^0.5.0"
+  }
+}
