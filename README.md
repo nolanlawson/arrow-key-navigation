@@ -1,4 +1,4 @@
-arrow-key-navigation
+arrow-key-navigation [![Build Status](https://travis-ci.org/nolanlawson/arrow-key-navigation.svg)](https://travis-ci.org/nolanlawson/arrow-key-navigation) 
 =====
 
 ## Overview
