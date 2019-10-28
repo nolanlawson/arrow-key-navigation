@@ -2,7 +2,7 @@
  * Makes it so the left and right arrows change focus, ala Tab/Shift+Tab. This is mostly designed
  * for KaiOS devices.
  */
-/* global document, addEventListener, removeEventListener */
+/* global document, addEventListener, removeEventListener, getSelection */
 
 interface FocusTrapTest { (element: Element): boolean }
 
@@ -63,7 +63,7 @@ function shouldIgnoreEvent (activeElement, key) {
   var selectionEnd
   var len
   if (isContentEditable) {
-    var selection = window.getSelection()
+    var selection = getSelection()
     selectionStart = selection.anchorOffset
     selectionEnd = selection.focusOffset
     len = activeElement.textContent.length
@@ -106,7 +106,7 @@ function focusNextOrPrevious (event, key) {
 function handleEnter (event) {
   var activeElement = document.activeElement
   if (activeElement.tagName === 'INPUT' &&
-    checkboxRadioInputTypes.indexOf(activeElement.getAttribute('type')) !== -1) {
+    checkboxRadioInputTypes.indexOf(activeElement.getAttribute('type').toLowerCase()) !== -1) {
     // Explicitly override "enter" on an input and make it fire the checkbox/radio
     (activeElement as HTMLInputElement).click()
     event.preventDefault()
@@ -132,22 +132,24 @@ function keyListener (event) {
 }
 
 /**
- * Start listening for left/right keyboard events. Attaches a listener to the window.
+ * Start listening for keyboard events. Attaches a listener to the window.
  */
 function register () {
   addEventListener('keydown', keyListener)
 }
 
 /**
- * Stop listening for left/right keyboard events. Unattaches a listener to the window.
+ * Stop listening for keyboard events. Unattaches a listener to the window.
  */
 function unregister () {
   removeEventListener('keydown', keyListener)
 }
 
 /**
- * Set a focus trap test to identify any focus traps in the DOM.
- * @param test: FocusTrapTest
+ * Set a focus trap test to identify any focus traps in the DOM, i.e. a top-level DOM node that indicates the root
+ * of a focus trap. Once this is set, if focus changes within the focus trap, then will not leave the focus trap.
+ * @param test: the test function
+ * @see https://w3c.github.io/aria-practices/examples/dialog-modal/dialog.html
  */
 function setFocusTrapTest (test: FocusTrapTest) {
   focusTrapTest = test

@@ -1,7 +1,7 @@
 {
   "name": "arrow-key-navigation",
   "version": "1.0.0",
-  "description": "Add left/right keyboard navigation to a KaiOS app or web app",
+  "description": "Add left/right key navigation to a KaiOS app or web app",
   "author": "Nolan Lawson <nolan@nolanlawson.com>",
   "license": "Apache-2.0",
   "keywords": [
