@@ -172,7 +172,32 @@ describe('test suite', () => {
       typeRight()
       assert.deepStrictEqual(document.activeElement.constructor.name, 'HTMLBodyElement')
       typeLeft()
-      assert.deepStrictEqual(document.activeElement.constructor.name, 'HTMLBodyElement')
+      assert.deepStrictEqual(document.activeElement.constructor.name, 'HTMLBodyElement');
+    })
+
+    it('handles element becoming disabled while focused', () => {
+      // if a button is disabled when it's focused (for whatever reason), then the left/right
+      // focus should still change to the proper element to its left/right
+      document.body.innerHTML = `div class="container">
+        <button class="button-1">1</button>
+        <button class="button-2">2</button>
+        <button class="button-3">3</button>
+      </div>`
+      typeRight()
+      assertActiveClass(['button-1'])
+      typeRight()
+      assertActiveClass(['button-2'])
+      $('.button-2').disabled = true
+      typeRight()
+      assertActiveClass(['button-3'])
+      typeLeft()
+      assertActiveClass(['button-1'])
+      $('.button-2').disabled = false
+      typeRight()
+      assertActiveClass(['button-2'])
+      $('.button-2').disabled = true
+      typeLeft()
+      assertActiveClass(['button-1'])
     })
   })
 

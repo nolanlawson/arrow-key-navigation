@@ -53,3 +53,21 @@ if (/KAIOS/.test(navigator.userAgent)) {
   })
 }
 ```
+
+## Contributing
+
+### Build
+
+    npm run build
+
+### Lint
+
+    npm run lint
+
+### Fix most lint issues
+
+    npm run lint:fix
+
+### Test
+
+    npm test
