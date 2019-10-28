@@ -2,6 +2,29 @@ require('jsdom-global')()
 const lib = require('../pkg')
 const assert = require('assert')
 
+// We check for offsetWidth/offsetHeight to avoid elements that are display:none, but JSDom just returns
+// zero for everything, so we unbreak this.
+Object.defineProperties(HTMLElement.prototype, {
+  offsetWidth: {
+    get: function () {
+      return 1
+    }
+  },
+  offsetHeight: {
+    get: function () {
+      return 1
+    }
+  }
+})
+
+const $ = document.querySelector.bind(document)
+let oldActiveElement
+
+// keep track of the active element before the library does anything
+function onKeyDownBefore () {
+  oldActiveElement = document.activeElement
+}
+
 function isTextInput (element) {
   const tagName = element.tagName
   const isTextarea = tagName === 'TEXTAREA'
@@ -10,14 +33,6 @@ function isTextInput (element) {
       element.getAttribute('type').toLowerCase()) !== -1
   const isContentEditable = element.hasAttribute('contenteditable')
   return isTextarea || isTextInput || isContentEditable
-}
-
-const $ = document.querySelector.bind(document)
-let oldActiveElement
-
-// keep track of the active element before the library does anything
-function onKeyDownBefore () {
-  oldActiveElement = document.activeElement
 }
 
 // simulate normal behavior when keydown/keyup happens, such as moving the cursor left/right in an input
