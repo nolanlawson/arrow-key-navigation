@@ -8,7 +8,7 @@ interface FocusTrapTest { (element: Element): boolean }
 
 // this query is adapted from via a11y-dialog
 var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
-  'button, iframe, object, embed, [contenteditable], [tabindex]'
+  'button, iframe, object, embed, [contenteditable], [tabindex], video[controls], audio[controls]'
 var textInputTypes = ['text', 'search', 'number', 'email', 'url']
 var checkboxRadioInputTypes = ['checkbox', 'radio']
 
