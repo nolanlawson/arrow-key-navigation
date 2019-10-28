@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - "10"
+dist: bionic
+sudo: false
+before_script:
+  - npm run lint
+script: npm test
+branches:
+  only:
+    - master
