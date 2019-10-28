@@ -1,5 +1,5 @@
 {
-  "name": "dpad-navigation",
+  "name": "arrow-key-navigation",
   "version": "1.0.0",
   "description": "Add left/right keyboard navigation to a KaiOS app or website",
   "author": "Nolan Lawson <nolan@nolanlawson.com>",

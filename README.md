@@ -1,9 +1,9 @@
-dpad-navigation
+arrow-key-navigation
 =====
 
 ## Overview
 
-`dpad-navigation` is a simple utility to add left/right focus navigation to a web app. It's
+`arrow-key-navigation` is a simple utility to add left/right focus navigation to a web app. It's
 designed for KaiOS apps but also available for any browser.
 
 The basic idea is to make the <kbd>←</kbd> and <kbd>→</kbd> keys act similar to 
@@ -13,15 +13,15 @@ to add basic KaiOS accessibility ot an existing web app.
 
 ## Install
 
-    npm install --save dpad-navigation
+    npm install --save arrow-key-navigation
 
 ## Usage
 
 ```js
-const dpadNavigation = require('dpad-navigation')
+const arrowKeyNavigation = require('arrow-key-navigation')
 
-dpadNavigation.register() // start listening for ←/→ key inputs
-dpadNavigation.unregister() // stop listening
+arrowKeyNavigation.register() // start listening for left/right key inputs
+arrowKeyNavigation.unregister() // stop listening
 ```
 
 ## Focus traps
@@ -32,10 +32,10 @@ accomplish this, you can set a "focus trap test" which takes an element as input
 to indicate that the element is a focus trap (e.g. the modal dialog root):
 
 ```js
-dpadNavigation.setFocusTrapTest(element => {
+arrowKeyNavigation.setFocusTrapTest(element => {
   return element.classList.contains('my-dialog-class')
 })
 ```
 
-If you don't call `setFocusTrapTest()`, then `dpad-navigation` will assume that there are no focus traps
+If you don't call `setFocusTrapTest()`, then `arrow-key-navigation` will assume that there are no focus traps
 in your app.
