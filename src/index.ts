@@ -14,7 +14,7 @@ var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
 
-function getFocusableElements(activeElement) {
+function getFocusableElements (activeElement) {
   // Respect focus trap inside of dialogs
   var dialogParent = getFocusTrapParent(activeElement)
   var root = dialogParent || document
@@ -75,10 +75,9 @@ function shouldIgnoreEvent (activeElement, key) {
   // if the cursor is inside of a textarea/input, then don't focus to the next/previous element
   // unless the cursor is at the beginning or the end
   if (key === 'ArrowLeft' && selectionStart === selectionEnd && selectionStart === 0) {
-    return false;
-  }
-  else if (key === 'ArrowRight' && selectionStart === selectionEnd && selectionStart === len) {
-    return false;
+    return false
+  } else if (key === 'ArrowRight' && selectionStart === selectionEnd && selectionStart === len) {
+    return false
   }
   return true
 }
