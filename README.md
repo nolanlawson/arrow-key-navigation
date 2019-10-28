@@ -9,7 +9,7 @@ designed for KaiOS apps but also available for any browser.
 The basic idea is to make the <kbd>←</kbd> and <kbd>→</kbd> keys act similar to 
 <kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd>, i.e. to change focus between focusable elements in the DOM.
 Since the <kbd>↑</kbd> and <kbd>↓</kbd> keys typically scroll the page in KaiOS, this is usually all you need
-to add basic KaiOS accessibility ot an existing web app.
+to add basic KaiOS accessibility to an existing web app.
 
 It will also listen for the <kbd>Enter</kbd> key for certain special cases like checkbox/radio buttons.
 
