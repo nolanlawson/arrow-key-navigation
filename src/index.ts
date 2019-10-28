@@ -26,7 +26,8 @@ function getFocusableElements (activeElement) {
   for (var i = 0; i < len; i++) {
     var element = elements[i]
     if (element === activeElement || (
-        !element.disabled && !/^-/.test(element.getAttribute('tabindex') || '')
+        !element.disabled && !/^-/.test(element.getAttribute('tabindex') || '') &&
+        (element.offsetWidth > 0 || element.offsetHeight > 0)
     )) {
       res.push(element)
     }
