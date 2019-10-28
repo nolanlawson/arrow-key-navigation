@@ -25,38 +25,17 @@ function onKeyDownAfter (e) {
   if (!oldActiveElement || !isTextInput(oldActiveElement)) {
     return
   }
-  var selectionStart
-  var selectionEnd
-  var len
-  var selection
-  var isContentEditable = oldActiveElement.hasAttribute('contenteditable')
-  if (isContentEditable) {
-    selection = window.getSelection()
-    selectionStart = selection.anchorOffset
-    selectionEnd = selection.focusOffset
-    len = oldActiveElement.textContent.length
-  } else {
-    selectionStart = oldActiveElement.selectionStart
-    selectionEnd = oldActiveElement.selectionEnd
-    len = oldActiveElement.value.length
-  }
+  const selectionStart = oldActiveElement.selectionStart
+  const len = oldActiveElement.value.length
   if (e.key === 'ArrowLeft') {
     if (selectionStart > 0) {
-      if (isContentEditable) {
-        selection.collapse(selectionStart - 1)
-      } else {
-        oldActiveElement.selectionStart--
-        oldActiveElement.selectionEnd--
-      }
+      oldActiveElement.selectionStart--
+      oldActiveElement.selectionEnd--
     }
   } else if (e.key === 'ArrowRight') {
     if (oldActiveElement.selectionEnd < len) {
-      if (isContentEditable) {
-        selection.collapse(selectionStart + 1)
-      } else {
-        oldActiveElement.selectionEnd++
-        oldActiveElement.selectionStart++
-      }
+      oldActiveElement.selectionEnd++
+      oldActiveElement.selectionStart++
     }
   }
 }
@@ -156,24 +135,19 @@ describe('test suite', () => {
       assert($('.input-3').checked, 'checked after pressing enter')
     })
 
-    it('handles contenteditable correctly', () => {
+    // TODO: can't actually test contenteditable in jsdom: https://github.com/jsdom/jsdom/issues/2472
+    it.skip('handles contenteditable correctly', () => {
       document.body.innerHTML = `<div class=container>
         <div class="editable" contenteditable>hi</div>
         <input type="text" class="input">
       </div>`
-      console.log('active', document.activeElement, 'selection', document.activeElement.selectionStart)
       typeRight()
-      console.log('active', document.activeElement, 'selection', document.activeElement.selectionStart)
       assertActiveClass(['editable'])
       typeRight()
-      console.log('active', document.activeElement, 'selection', document.activeElement.selectionStart)
       assertActiveClass(['editable'])
       typeRight()
-      console.log('active', document.activeElement, 'selection', document.activeElement.selectionStart)
       assertActiveClass(['editable'])
       typeRight()
-      console.log('active', document.activeElement, 'selection', document.activeElement.selectionStart)
-      console.log(document.activeElement)
       assertActiveClass(['input'])
     })
 

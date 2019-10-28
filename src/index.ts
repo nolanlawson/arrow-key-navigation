@@ -1,10 +1,12 @@
-/* global document, addEventListener, removeEventListener, getSelection */
-// Makes it so the left and right arrows change focus, ala Tab/Shift+Tab. This is mostly designed
-// for KaiOS devices.
+/**
+ * Makes it so the left and right arrows change focus, ala Tab/Shift+Tab. This is mostly designed
+ * for KaiOS devices.
+ */
+/* global document, addEventListener, removeEventListener */
 
 interface FocusTrapTest { (element: Element): boolean }
 
-// via a11y-dialog
+// this query is adapted from via a11y-dialog
 var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
   'button, iframe, object, embed, [contenteditable], [tabindex]'
 var textTypes = ['text', 'search', 'number', 'email', 'url']
@@ -60,7 +62,7 @@ function shouldIgnoreEvent (activeElement, key) {
   var selectionEnd
   var len
   if (isContentEditable) {
-    var selection = getSelection()
+    var selection = window.getSelection()
     selectionStart = selection.anchorOffset
     selectionEnd = selection.focusOffset
     len = activeElement.textContent.length
