@@ -9,7 +9,7 @@ interface FocusTrapTest { (element: Element): boolean }
 // this query is adapted from via a11y-dialog
 var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
   'button, iframe, object, embed, [contenteditable], [tabindex]'
-var textTypes = ['text', 'search', 'number', 'email', 'url']
+var textInputTypes = ['text', 'search', 'number', 'email', 'url']
 var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
@@ -51,7 +51,7 @@ function shouldIgnoreEvent (activeElement, key) {
   var tagName = activeElement.tagName
   var isTextarea = tagName === 'TEXTAREA'
   var isTextInput = tagName === 'INPUT' &&
-    textTypes.indexOf(activeElement.getAttribute('type').toLowerCase()) !== -1
+    textInputTypes.indexOf(activeElement.getAttribute('type').toLowerCase()) !== -1
   var isContentEditable = activeElement.hasAttribute('contenteditable')
 
   if (!isTextarea && !isTextInput && !isContentEditable) {
