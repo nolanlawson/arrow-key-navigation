@@ -48,5 +48,13 @@
     "tslint": "^5.20.0",
     "tslint-config-standard": "^8.0.1",
     "typescript": "^3.6.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nolanlawson/arrow-key-navigation.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nolanlawson/arrow-key-navigation/issues"
+  },
+  "homepage": "https://github.com/nolanlawson/arrow-key-navigation#readme"
 }
