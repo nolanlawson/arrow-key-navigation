@@ -20,7 +20,7 @@ It will also listen for the <kbd>Enter</kbd> key for certain special cases like 
 ## Usage
 
 ```js
-const arrowKeyNavigation = require('arrow-key-navigation')
+import * as arrowKeyNavigation from 'arrow-key-navigation'
 
 arrowKeyNavigation.register() // start listening for key inputs
 arrowKeyNavigation.unregister() // stop listening
