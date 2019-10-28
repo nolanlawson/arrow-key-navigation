@@ -100,7 +100,6 @@ function focusNextOrPrevious (event, key) {
   }
   element.focus()
   event.preventDefault()
-  event.stopPropagation()
 }
 
 function handleEnter (event) {
@@ -110,7 +109,6 @@ function handleEnter (event) {
     // Explicitly override "enter" on an input and make it fire the checkbox/radio
     (activeElement as HTMLInputElement).click()
     event.preventDefault()
-    event.stopPropagation()
   }
 }
 
