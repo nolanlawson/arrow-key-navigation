@@ -1,4 +1,4 @@
-/* global document, addEventListener, removeEventListener */
+/* global document, addEventListener, removeEventListener, getSelection */
 // Makes it so the left and right arrows change focus, ala Tab/Shift+Tab. This is mostly designed
 // for KaiOS devices.
 
@@ -50,20 +50,33 @@ function shouldIgnoreEvent (activeElement, key) {
   var isTextarea = tagName === 'TEXTAREA'
   var isTextInput = tagName === 'INPUT' &&
     textTypes.indexOf(activeElement.getAttribute('type').toLowerCase()) !== -1
-  var isContentEditable = activeElement.getAttribute('contenteditable')
+  var isContentEditable = activeElement.hasAttribute('contenteditable')
 
   if (!isTextarea && !isTextInput && !isContentEditable) {
     return false
   }
 
-  var selectionStart = activeElement.selectionStart
-  var selectionEnd = activeElement.selectionEnd
-  // if the cursor is inside of a textarea/input, then don't focust to the next/previous element
+  var selectionStart
+  var selectionEnd
+  var len
+  if (isContentEditable) {
+    var selection = getSelection()
+    selectionStart = selection.anchorOffset
+    selectionEnd = selection.focusOffset
+    len = activeElement.textContent.length
+  } else {
+    selectionStart = activeElement.selectionStart
+    selectionEnd = activeElement.selectionEnd
+    len = activeElement.value.length
+  }
+
+  // if the cursor is inside of a textarea/input, then don't focus to the next/previous element
   // unless the cursor is at the beginning or the end
   if (key === 'ArrowLeft' && selectionStart === selectionEnd && selectionStart === 0) {
-    return false
-  } else if (key === 'ArrowRight' && selectionStart === selectionEnd && selectionStart === activeElement.value.length) {
-    return false
+    return false;
+  }
+  else if (key === 'ArrowRight' && selectionStart === selectionEnd && selectionStart === len) {
+    return false;
   }
   return true
 }
@@ -74,6 +87,9 @@ function focusNextOrPrevious (event, key) {
     return
   }
   var focusableElements = getFocusableElements(activeElement)
+  if (!focusableElements.length) {
+    return
+  }
   var index = focusableElements.indexOf(activeElement)
   var element
   if (key === 'ArrowLeft') {

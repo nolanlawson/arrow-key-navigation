@@ -1,16 +1,19 @@
 {
   "name": "arrow-key-navigation",
   "version": "1.0.0",
-  "description": "Add left/right keyboard navigation to a KaiOS app or website",
+  "description": "Add left/right keyboard navigation to a KaiOS app or web app",
   "author": "Nolan Lawson <nolan@nolanlawson.com>",
   "license": "Apache-2.0",
   "keywords": [
     "kaios",
     "navigation",
     "accessibility",
+    "a11y",
     "focus",
     "dpad",
-    "d-pad"
+    "d-pad",
+    "arrow",
+    "key"
   ],
   "scripts": {
     "lint": "tslint ./src/**/*",

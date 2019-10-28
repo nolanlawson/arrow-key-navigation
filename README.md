@@ -11,6 +11,8 @@ The basic idea is to make the <kbd>←</kbd> and <kbd>→</kbd> keys act similar
 Since the <kbd>↑</kbd> and <kbd>↓</kbd> keys typically scroll the page in KaiOS, this is usually all you need
 to add basic KaiOS accessibility ot an existing web app.
 
+It will also listen for the <kbd>Enter</kbd> key for certain special cases like checkbox/radio buttons.
+
 ## Install
 
     npm install --save arrow-key-navigation
@@ -20,7 +22,7 @@ to add basic KaiOS accessibility ot an existing web app.
 ```js
 const arrowKeyNavigation = require('arrow-key-navigation')
 
-arrowKeyNavigation.register() // start listening for left/right key inputs
+arrowKeyNavigation.register() // start listening for key inputs
 arrowKeyNavigation.unregister() // stop listening
 ```
 
@@ -39,3 +41,15 @@ arrowKeyNavigation.setFocusTrapTest(element => {
 
 If you don't call `setFocusTrapTest()`, then `arrow-key-navigation` will assume that there are no focus traps
 in your app.
+
+## Conditional or lazy loading
+
+You can choose to install this module only in KaiOS environments using logic like the following:
+
+```js
+if (/KAIOS/.test(navigator.userAgent)) {
+  import('arrow-key-navigation').then(arrowKeyNavigation => {
+    arrowKeyNavigation.register()
+  })
+}
+```
