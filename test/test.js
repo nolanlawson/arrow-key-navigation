@@ -176,6 +176,20 @@ describe('test suite', () => {
       assertActiveClass(['input-4'])
     })
 
+    it('skips inert elements', () => {
+      document.body.innerHTML = `<div class=container>
+        <button class="button-1">hey</button>
+        <button class="button-2" inert>hello</button>
+        <button class="button-3">yo</button>
+      </div>`
+      typeRight()
+      assertActiveClass(['button-1'])
+      typeRight()
+      assertActiveClass(['button-3'])
+      typeLeft()
+      assertActiveClass(['button-1'])
+    })
+
     // TODO: can't actually test contenteditable in jsdom: https://github.com/jsdom/jsdom/issues/2472
     it.skip('handles contenteditable correctly', () => {
       document.body.innerHTML = `<div class=container>
