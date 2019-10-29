@@ -14,7 +14,8 @@ var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
 // TODO: email/number types are a special type, in that they return selectionStart/selectionEnd as null
 // As far as I can tell, there is no way to actually get the caret position from these inputs. So we
 // don't do the proper caret handling for those inputs, unfortunately.
-var textInputTypes = ['text', 'search', 'url', 'password']
+// https://html.spec.whatwg.org/multipage/input.html#do-not-apply
+var textInputTypes = ['text', 'search', 'url', 'password', 'tel']
 
 var checkboxRadioInputTypes = ['checkbox', 'radio']
 
