@@ -29,7 +29,7 @@ function isTextInput (element) {
   const tagName = element.tagName
   const isTextarea = tagName === 'TEXTAREA'
   const isTextInput = tagName === 'INPUT' &&
-    ['text', 'search', 'number', 'email', 'url'].indexOf(
+    ['text', 'search', 'url', 'password'].indexOf(
       element.getAttribute('type').toLowerCase()) !== -1
   const isContentEditable = element.hasAttribute('contenteditable')
   return isTextarea || isTextInput || isContentEditable
@@ -148,6 +148,32 @@ describe('test suite', () => {
       assert(!$('.input-3').checked, 'not checked originally')
       typeEnter()
       assert($('.input-3').checked, 'checked after pressing enter')
+    })
+
+    it('handles url/search/password inputs correctly', () => {
+      document.body.innerHTML = `<div class=container>
+        <input type="search" class="input-1">
+        <input type="url" class="input-2">
+        <input type="password" class="input-3">
+        <input type="text" class="input-4">
+      </div>`
+      $('.input-1').value = 'bar'
+      $('.input-2').value = 'a.com'
+      $('.input-3').value = 'psst'
+      for (let i = 0; i < 4; i++) {
+        typeRight()
+        assertActiveClass(['input-1'])
+      }
+      for (let i = 0; i < 6; i++) {
+        typeRight()
+        assertActiveClass(['input-2'])
+      }
+      for (let i = 0; i < 5; i++) {
+        typeRight()
+        assertActiveClass(['input-3'])
+      }
+      typeRight()
+      assertActiveClass(['input-4'])
     })
 
     // TODO: can't actually test contenteditable in jsdom: https://github.com/jsdom/jsdom/issues/2472

@@ -6,10 +6,16 @@
 
 interface FocusTrapTest { (element: Element): boolean }
 
-// this query is adapted from via a11y-dialog
+// This query is adapted from a11y-dialog
+// https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
 var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
   'button, iframe, object, embed, [contenteditable], [tabindex], video[controls], audio[controls]'
-var textInputTypes = ['text', 'search', 'number', 'email', 'url']
+
+// TODO: email/number types are a special type, in that they return selectionStart/selectionEnd as null
+// As far as I can tell, there is no way to actually get the caret position from these inputs. So we
+// don't do the proper caret handling for those inputs, unfortunately.
+var textInputTypes = ['text', 'search', 'url', 'password']
+
 var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
