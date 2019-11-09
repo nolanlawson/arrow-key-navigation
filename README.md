@@ -17,6 +17,8 @@ It will also listen for the <kbd>Enter</kbd> key for certain special cases like 
 
     npm install --save arrow-key-navigation
 
+Or [browse unpkg.com](https://unpkg.com/browse/arrow-key-navigation/) for a list of build files.
+
 ## Usage
 
 ```js
@@ -71,3 +73,9 @@ if (/KAIOS/.test(navigator.userAgent)) {
 ### Test
 
     npm test
+
+### Manual KaiOS app test
+
+The `index.html` and `manifest.webapp` files are designed for a quick-and-dirty KaiOS app test.
+
+Run `npm run build` and then install the root directory as a packaged KaiOS app to test it.
