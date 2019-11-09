@@ -212,6 +212,20 @@ describe('test suite', () => {
       assertActiveClass(['input'])
     })
 
+    it('handles details/summary correctly', () => {
+      document.body.innerHTML = `<div class=container>
+        <details>
+          <summary class="summary">Click for details</summary>
+          <p>Hey some details!</p>
+        </details>
+        <button class="yolo">yolo</button>
+      </div>`
+      typeRight()
+      assertActiveClass(['summary'])
+      typeRight()
+      assertActiveClass(['yolo'])
+    })
+
     it('works when no focusable elements', () => {
       document.body.innerHTML = '<div class="foo">hi</div>'
       assert.deepStrictEqual(document.activeElement.constructor.name, 'HTMLBodyElement')
