@@ -1,6 +1,6 @@
 {
   "name": "arrow-key-navigation",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Add left/right key navigation to a KaiOS app or web app",
   "author": "Nolan Lawson <nolan@nolanlawson.com>",
   "license": "Apache-2.0",
@@ -24,10 +24,21 @@
   },
   "@pika/pack": {
     "pipeline": [
-      ["@pika/plugin-ts-standard-pkg"],
-      ["@pika/plugin-build-node"],
-      ["@pika/plugin-build-web"],
-      ["@pika/plugin-build-umd", { "name":  "arrowKeyNavigation" }]
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-node"
+      ],
+      [
+        "@pika/plugin-build-web"
+      ],
+      [
+        "@pika/plugin-build-umd",
+        {
+          "name": "arrowKeyNavigation"
+        }
+      ]
     ]
   },
   "devDependencies": {
