@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KaiOS arrow-key-navigation test app</title>
+    <style>
+        label, details, .block {
+            display: block;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>KaiOS arrow-key-navigation test app</h1>
+<details>
+    <summary>hey click me</summary>
+    <p>here is some more info</p>
+</details>
+<label>
+    URL
+    <input type=url value="foo.com">
+</label>
+<label>
+    Email
+    <input type=email value="foo@foo.com">
+</label>
+<label>
+    Number
+    <input type=number value="123">
+</label>
+<label>
+    Text
+    <input type=text value="foobar">
+</label>
+<label>
+    Search
+    <input type=search value="baz">
+</label>
+<label>
+    Password
+    <input type=password value="psst">
+</label>
+<label>
+    Tel
+    <input type=tel value="123">
+</label>
+<div class="block">
+    Content editable
+    <div contenteditable>Edit meeeee</div>
+</div>
+<div class="block">
+    <button type="button">Hello button</button>
+</div>
+<div class="block">
+    <label>Check!
+        <input type="checkbox">
+    </label>
+</div>
+<div class="block">
+    Radio!
+    <label>Radio 1
+        <input type="radio" name="radio" value="radio1">
+    </label>
+    <label>Radio 2
+        <input type="radio" name="radio" value="radio2">
+    </label>
+</div>
+<script src="pkg/dist-umd/index.js"></script>
+<script>
+  arrowKeyNavigation.register()
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "name": "Arrow Key Nav",
+  "description": "arrow-key-navigation test app",
+  "type": "web",
+  "launch_path": "/index.html"
+}
