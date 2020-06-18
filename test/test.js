@@ -20,6 +20,10 @@ Object.defineProperties(HTMLElement.prototype, {
 const $ = document.querySelector.bind(document)
 let oldActiveElement
 
+function putCursorAtStart(el) {
+  el.selectionStart = el.selectionEnd = 0
+}
+
 // keep track of the active element before the library does anything
 function onKeyDownBefore () {
   oldActiveElement = document.activeElement
@@ -133,6 +137,7 @@ describe('test suite', () => {
         <input type="checkbox" class="input-3">
       </div>`
       $('.input-1').value = 'foo'
+      putCursorAtStart($('.input-1'))
       typeRight()
       assertActiveClass(['input-1'])
       typeRight()
@@ -159,9 +164,13 @@ describe('test suite', () => {
         <input type="text" class="input-5">
       </div>`
       $('.input-1').value = 'bar'
+      putCursorAtStart($('.input-1'))
       $('.input-2').value = 'a.com'
+      putCursorAtStart($('.input-2'))
       $('.input-3').value = 'psst'
+      putCursorAtStart($('.input-3'))
       $('.input-4').value = '123'
+      putCursorAtStart($('.input-4'))
       for (let i = 0; i < 4; i++) {
         typeRight()
         assertActiveClass(['input-1'])
