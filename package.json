@@ -48,13 +48,13 @@
     "@pika/plugin-build-web": "^0.7.1",
     "@pika/plugin-ts-standard-pkg": "^0.7.1",
     "assert": "^2.0.0",
-    "jsdom": "^15.2.0",
+    "jsdom": "^15.2.1",
     "jsdom-global": "^3.0.2",
-    "mocha": "^6.2.2",
-    "standard": "^14.3.1",
-    "tslint": "^5.20.0",
+    "mocha": "^6.2.3",
+    "standard": "^14.3.4",
+    "tslint": "^5.20.1",
     "tslint-config-standard": "^8.0.1",
-    "typescript": "^3.6.4"
+    "typescript": "^3.9.5"
   },
   "repository": {
     "type": "git",
