@@ -6,6 +6,8 @@
 
 interface FocusTrapTest { (element: Element): boolean }
 
+var shadowRoots = []
+
 // This query is adapted from a11y-dialog
 // https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
 var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
@@ -22,13 +24,66 @@ var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
 
+function isAncestor (node, ancestor) {
+  var parent = node
+  while (parent) {
+    parent = parent.parentElement
+    if (parent === ancestor) {
+      return true
+    }
+  }
+  return false
+}
+
+// A custom element with open shadow DOM may contain any number of
+// focusable elements. It itself may or may not be focusable.
+// The goal here is to traverse the shadow roots to find any of their
+// children that may be focusable, and then add them to the list of
+// light nodes *in the proper DOM order*.
+// TODO: this doesn't consider shadow roots inside of shadow roots
+function addShadowNodes (root, nodes) {
+  for (var i = 0; i < shadowRoots.length; i++) {
+    var shadowRoot = shadowRoots[i]
+    var host = shadowRoot && shadowRoot.getRootNode() && shadowRoot.getRootNode().host
+    if (!host || !isAncestor(host, root)) {
+      continue
+    }
+    var shadowNodes = shadowRoot.querySelectorAll(focusablesQuery)
+    if (!shadowNodes.length) {
+      continue
+    }
+
+    // use a TreeWalker to traverse the DOM to find the proper place
+    // in the list of light nodes to insert these shadow nodes
+    var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT)
+    treeWalker.currentNode = host
+    var nextNode = treeWalker.nextNode()
+    while (nextNode) {
+      var index = nodes.indexOf(nextNode)
+      if (index !== -1) {
+        Array.prototype.splice.apply(nodes, [0].concat(shadowNodes))
+        break
+      }
+      nextNode = treeWalker.nextNode()
+    }
+  }
+}
+
+function getCandidateFocusableElements (root) {
+  var nodes = root.querySelectorAll(focusablesQuery)
+  if (shadowRoots.length) {
+    addShadowNodes(root, nodes)
+  }
+  return nodes
+}
+
 function getFocusableElements (activeElement) {
   // Respect focus trap inside of dialogs
   var dialogParent = getFocusTrapParent(activeElement)
   var root = dialogParent || document
 
   var res = []
-  var elements = root.querySelectorAll(focusablesQuery)
+  var elements = getCandidateFocusableElements(root)
 
   var len = elements.length
   for (var i = 0; i < len; i++) {
@@ -165,8 +220,34 @@ function setFocusTrapTest (test: FocusTrapTest) {
   focusTrapTest = test
 }
 
+/**
+ * Register the shadow root of an open shadow DOM that should also be traversed when searching
+ * for focusable elements in the DOM. Should be removed with `unregisterShadowRoot()`
+ * if the host custom element is removed from the DOM.
+ *
+ * @param shadowRoot
+ */
+function registerShadowRoot (shadowRoot: ShadowRoot) {
+  if (shadowRoots.indexOf(shadowRoot) === -1) {
+    shadowRoots.push(shadowRoot)
+  }
+}
+
+/**
+ * Unregister a shadow root that was added with `registerShadowRoot()`.
+ * @param shadowRoot
+ */
+function unregisterShadowRoot (shadowRoot: ShadowRoot) {
+  var index = shadowRoots.indexOf(shadowRoot)
+  if (index !== -1) {
+    shadowRoots.splice(index, 1)
+  }
+}
+
 export {
   register,
   unregister,
+  registerShadowRoot,
+  unregisterShadowRoot,
   setFocusTrapTest
 }
