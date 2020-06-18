@@ -24,6 +24,10 @@ var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
 
+function getHost(shadowRoot) {
+  return shadowRoot && shadowRoot.getRootNode() && shadowRoot.getRootNode().host
+}
+
 function isAncestor (node, ancestor) {
   var parent = node
   while (parent) {
@@ -64,7 +68,7 @@ function addShadowNodes (root, nodes) {
   }
   for (var i = 0; i < shadowRoots.length; i++) {
     var shadowRoot = shadowRoots[i]
-    var host = shadowRoot && shadowRoot.getRootNode() && shadowRoot.getRootNode().host
+    var host = getHost(shadowRoot)
     if (!host || !isAncestor(host, root)) {
       continue
     }

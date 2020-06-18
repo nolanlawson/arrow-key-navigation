@@ -87,6 +87,10 @@ function assertActiveClass (className) {
   assert.deepStrictEqual([...document.activeElement.classList], className)
 }
 
+function assertShadowActiveClass (className) {
+  assert.deepStrictEqual([...document.activeElement.shadowRoot.activeElement.classList], className)
+}
+
 describe('test suite', () => {
 
   beforeEach(() => {
@@ -300,6 +304,36 @@ describe('test suite', () => {
       assertActiveClass(['input'])
       typeLeft()
       assertActiveClass(['input'])
+    })
+  })
+
+  describe('shadow dom', () => {
+    it('works with shadow dom', () => {
+      class Component extends HTMLElement {
+        constructor() {
+          super()
+          this.attachShadow({ mode: 'open'})
+          this.shadowRoot.innerHTML = `
+            <input type=text class="inside-shadow">
+          `
+          this.classList.add('my-component')
+        }
+      }
+      customElements.define('my-component', Component)
+
+      document.body.innerHTML = `
+        <button class="button-1">one</button>
+        <my-component></my-component>
+        <button class="button-2">two</button>
+      `
+      typeRight()
+      assertActiveClass('button-1')
+      typeRight()
+      assertActiveClass('my-component')
+      assertShadowActiveClass('inside-shadow')
+      typeRight()
+      assertActiveClass('button-1')
+
     })
   })
 })
