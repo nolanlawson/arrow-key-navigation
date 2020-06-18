@@ -6,7 +6,7 @@
 
 interface FocusTrapTest { (element: Element): boolean }
 
-var shadowRoots = []
+var shadowRoots
 
 // This query is adapted from a11y-dialog
 // https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
@@ -35,6 +35,23 @@ function isAncestor (node, ancestor) {
   return false
 }
 
+// Given a root, a descendant node, and a list of other descendant nodes,
+// traverse the DOM to find where that node _would_ be inserted in the list
+// of descendant nodes, maintaining DOM (focus) order.
+function findNextNodeIndex(root, nodes, node) {
+  var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT)
+  treeWalker.currentNode = node
+  var nextNode = treeWalker.nextNode()
+  while (nextNode) {
+    var index = nodes.indexOf(nextNode)
+    if (index !== -1) {
+      return index
+    }
+    nextNode = treeWalker.nextNode()
+  }
+  return nodes.length // end of the list
+}
+
 // A custom element with open shadow DOM may contain any number of
 // focusable elements. It itself may or may not be focusable.
 // The goal here is to traverse the shadow roots to find any of their
@@ -42,6 +59,9 @@ function isAncestor (node, ancestor) {
 // light nodes *in the proper DOM order*.
 // TODO: this doesn't consider shadow roots inside of shadow roots
 function addShadowNodes (root, nodes) {
+  if (!shadowRoots.length) {
+    return
+  }
   for (var i = 0; i < shadowRoots.length; i++) {
     var shadowRoot = shadowRoots[i]
     var host = shadowRoot && shadowRoot.getRootNode() && shadowRoot.getRootNode().host
@@ -53,25 +73,14 @@ function addShadowNodes (root, nodes) {
       continue
     }
 
-    // use a TreeWalker to traverse the DOM to find the proper place
-    // in the list of light nodes to insert these shadow nodes
-    var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT)
-    treeWalker.currentNode = host
-    var nextNode = treeWalker.nextNode()
-    while (nextNode) {
-      var index = nodes.indexOf(nextNode)
-      if (index !== -1) {
-        Array.prototype.splice.apply(nodes, [0].concat(shadowNodes))
-        break
-      }
-      nextNode = treeWalker.nextNode()
-    }
+    var index = findNextNodeIndex(root, nodes, host)
+    Array.prototype.splice.apply(nodes, [index, 0].concat(shadowNodes))
   }
 }
 
 function getCandidateFocusableElements (root) {
   var nodes = root.querySelectorAll(focusablesQuery)
-  if (shadowRoots.length) {
+  if (shadowRoots) { // allow for better tree-shaking by minifiers if you aren't using shadow DOM
     addShadowNodes(root, nodes)
   }
   return nodes
@@ -228,6 +237,7 @@ function setFocusTrapTest (test: FocusTrapTest) {
  * @param shadowRoot
  */
 function registerShadowRoot (shadowRoot: ShadowRoot) {
+  shadowRoots = shadowRoots || []
   if (shadowRoots.indexOf(shadowRoot) === -1) {
     shadowRoots.push(shadowRoot)
   }
@@ -238,6 +248,7 @@ function registerShadowRoot (shadowRoot: ShadowRoot) {
  * @param shadowRoot
  */
 function unregisterShadowRoot (shadowRoot: ShadowRoot) {
+  shadowRoots = shadowRoots || []
   var index = shadowRoots.indexOf(shadowRoot)
   if (index !== -1) {
     shadowRoots.splice(index, 1)
