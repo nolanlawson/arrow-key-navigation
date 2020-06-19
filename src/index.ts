@@ -6,12 +6,6 @@
 
 interface FocusTrapTest { (element: Element): boolean }
 
-// This query is adapted from a11y-dialog
-// https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
-var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
-  'button, iframe, object, embed, [contenteditable], [tabindex], ' +
-  'video[controls], audio[controls], summary'
-
 // TODO: email/number types are a special type, in that they return selectionStart/selectionEnd as null
 // As far as I can tell, there is no way to actually get the caret position from these inputs. So we
 // don't do the proper caret handling for those inputs, unfortunately.
@@ -22,27 +16,18 @@ var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
 
-function getFocusableElements (activeElement) {
-  // Respect focus trap inside of dialogs
-  var dialogParent = getFocusTrapParent(activeElement)
-  var root = dialogParent || document
+// This query is adapted from a11y-dialog
+// https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
+var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
+    'button, iframe, object, embed, [contenteditable], [tabindex], ' +
+    'video[controls], audio[controls], summary'
 
-  var res = []
-  var elements = root.querySelectorAll(focusablesQuery)
-
-  var len = elements.length
-  for (var i = 0; i < len; i++) {
-    var element = elements[i]
-    if (element === activeElement || (
-        !element.disabled &&
-        !/^-/.test(element.getAttribute('tabindex') || '') &&
-        !element.hasAttribute('inert') && // see https://github.com/GoogleChrome/inert-polyfill
-        (element.offsetWidth > 0 || element.offsetHeight > 0)
-    )) {
-      res.push(element)
-    }
-  }
-  return res
+function isFocusable(element) {
+  return element.matches(focusablesQuery) &&
+    !element.disabled &&
+    !/^-/.test(element.getAttribute('tabindex') || '') &&
+    !element.hasAttribute('inert') && // see https://github.com/GoogleChrome/inert-polyfill
+    (element.offsetWidth > 0 || element.offsetHeight > 0)
 }
 
 function getFocusTrapParent (element) {
@@ -93,24 +78,32 @@ function shouldIgnoreEvent (activeElement, key) {
   return true
 }
 
+function getNextNode(root, targetElement, forwardDirection): HTMLElement {
+  var filter: NodeFilter = {
+    acceptNode: function (node) {
+      var accept = (node === targetElement || isFocusable(node))
+      return accept ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+    }
+  }
+  var walker: TreeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filter)
+  walker.currentNode = targetElement
+
+  var nextNode = forwardDirection ? walker.nextNode() : walker.previousNode()
+  return nextNode as HTMLElement
+}
+
 function focusNextOrPrevious (event, key) {
   var activeElement = document.activeElement
   if (shouldIgnoreEvent(activeElement, key)) {
     return
   }
-  var focusableElements = getFocusableElements(activeElement)
-  if (!focusableElements.length) {
-    return
+  var root = getFocusTrapParent(activeElement) || document
+  var forwardDirection = key === 'ArrowRight'
+  var nextNode = getNextNode(root, activeElement, forwardDirection)
+  if (nextNode && nextNode !== activeElement) {
+    nextNode.focus()
+    event.preventDefault()
   }
-  var index = focusableElements.indexOf(activeElement)
-  var element
-  if (key === 'ArrowLeft') {
-    element = focusableElements[index - 1] || focusableElements[0]
-  } else { // ArrowRight
-    element = focusableElements[index + 1] || focusableElements[focusableElements.length - 1]
-  }
-  element.focus()
-  event.preventDefault()
 }
 
 function handleEnter (event) {
