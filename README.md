@@ -74,6 +74,10 @@ if (/KAIOS/.test(navigator.userAgent)) {
 
     npm test
 
+### Code coverage
+
+    npm run cover
+
 ### Manual KaiOS app test
 
 The `index.html` and `manifest.webapp` files are designed for a quick-and-dirty KaiOS app test.
