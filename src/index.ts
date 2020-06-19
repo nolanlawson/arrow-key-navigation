@@ -43,7 +43,7 @@ function getFocusTrapParent (element) {
   }
 }
 
-function shouldIgnoreEvent (activeElement, key) {
+function shouldIgnoreEvent (activeElement, forwardDirection) {
   var tagName = activeElement.tagName
   var isTextarea = tagName === 'TEXTAREA'
   var isTextInput = tagName === 'INPUT' &&
@@ -70,9 +70,9 @@ function shouldIgnoreEvent (activeElement, key) {
 
   // if the cursor is inside of a textarea/input, then don't focus to the next/previous element
   // unless the cursor is at the beginning or the end
-  if (key === 'ArrowLeft' && selectionStart === selectionEnd && selectionStart === 0) {
+  if (!forwardDirection && selectionStart === selectionEnd && selectionStart === 0) {
     return false
-  } else if (key === 'ArrowRight' && selectionStart === selectionEnd && selectionStart === len) {
+  } else if (forwardDirection && selectionStart === selectionEnd && selectionStart === len) {
     return false
   }
   return true
@@ -94,11 +94,11 @@ function getNextNode(root, targetElement, forwardDirection): HTMLElement {
 
 function focusNextOrPrevious (event, key) {
   var activeElement = document.activeElement
-  if (shouldIgnoreEvent(activeElement, key)) {
+  var forwardDirection = key === 'ArrowRight'
+  if (shouldIgnoreEvent(activeElement, forwardDirection)) {
     return
   }
   var root = getFocusTrapParent(activeElement) || document
-  var forwardDirection = key === 'ArrowRight'
   var nextNode = getNextNode(root, activeElement, forwardDirection)
   if (nextNode && nextNode !== activeElement) {
     nextNode.focus()
