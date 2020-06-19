@@ -6,6 +6,12 @@
 
 interface FocusTrapTest { (element: Element): boolean }
 
+// This query is adapted from a11y-dialog
+// https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
+var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
+  'button, iframe, object, embed, [contenteditable], [tabindex], ' +
+  'video[controls], audio[controls], summary'
+
 // TODO: email/number types are a special type, in that they return selectionStart/selectionEnd as null
 // As far as I can tell, there is no way to actually get the caret position from these inputs. So we
 // don't do the proper caret handling for those inputs, unfortunately.
@@ -16,26 +22,27 @@ var checkboxRadioInputTypes = ['checkbox', 'radio']
 
 var focusTrapTest: FocusTrapTest = undefined
 
-// This query is adapted from a11y-dialog
-// https://github.com/edenspiekermann/a11y-dialog/blob/cf4ed81/a11y-dialog.js#L6-L18
-var focusablesQuery = 'a[href], area[href], input, select, textarea, ' +
-    'button, iframe, object, embed, [contenteditable], [tabindex], ' +
-    'video[controls], audio[controls], summary'
+function getFocusableElements (activeElement) {
+  // Respect focus trap inside of dialogs
+  var dialogParent = getFocusTrapParent(activeElement)
+  var root = dialogParent || document
 
-function getActiveElement () {
-  var activeElement = document.activeElement
-  while (activeElement.shadowRoot) {
-    activeElement = activeElement.shadowRoot.activeElement
+  var res = []
+  var elements = root.querySelectorAll(focusablesQuery)
+
+  var len = elements.length
+  for (var i = 0; i < len; i++) {
+    var element = elements[i]
+    if (element === activeElement || (
+        !element.disabled &&
+        !/^-/.test(element.getAttribute('tabindex') || '') &&
+        !element.hasAttribute('inert') && // see https://github.com/GoogleChrome/inert-polyfill
+        (element.offsetWidth > 0 || element.offsetHeight > 0)
+    )) {
+      res.push(element)
+    }
   }
-  return activeElement
-}
-
-function isFocusable (element) {
-  return element.matches(focusablesQuery) &&
-    !element.disabled &&
-    !/^-/.test(element.getAttribute('tabindex') || '') &&
-    !element.hasAttribute('inert') && // see https://github.com/GoogleChrome/inert-polyfill
-    (element.offsetWidth > 0 || element.offsetHeight > 0)
+  return res
 }
 
 function getFocusTrapParent (element) {
@@ -51,7 +58,7 @@ function getFocusTrapParent (element) {
   }
 }
 
-function shouldIgnoreEvent (activeElement, forwardDirection) {
+function shouldIgnoreEvent (activeElement, key) {
   var tagName = activeElement.tagName
   var isTextarea = tagName === 'TEXTAREA'
   var isTextInput = tagName === 'INPUT' &&
@@ -78,61 +85,36 @@ function shouldIgnoreEvent (activeElement, forwardDirection) {
 
   // if the cursor is inside of a textarea/input, then don't focus to the next/previous element
   // unless the cursor is at the beginning or the end
-  if (!forwardDirection && selectionStart === selectionEnd && selectionStart === 0) {
+  if (key === 'ArrowLeft' && selectionStart === selectionEnd && selectionStart === 0) {
     return false
-  } else if (forwardDirection && selectionStart === selectionEnd && selectionStart === len) {
+  } else if (key === 'ArrowRight' && selectionStart === selectionEnd && selectionStart === len) {
     return false
   }
   return true
 }
 
-function getNextNode (root, targetElement, forwardDirection): HTMLElement {
-  var filter: NodeFilter = {
-    acceptNode: function (node: HTMLElement) {
-      var accept = (node === targetElement || node.shadowRoot || isFocusable(node))
-      return accept ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-    }
-  }
-  var walker: TreeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filter)
-  if (targetElement) {
-    walker.currentNode = targetElement
-  }
-
-  var nextNode: HTMLElement
-
-  if (forwardDirection) {
-    nextNode = walker.nextNode() as HTMLElement
-  } else if (targetElement) {
-    nextNode = walker.previousNode() as HTMLElement
-  } else { // iterating backwards through shadow root, use last child
-    nextNode = walker.lastChild() as HTMLElement
-  }
-
-  if (nextNode && nextNode.shadowRoot) { // push into the shadow DOM
-    return getNextNode(nextNode.shadowRoot, null, forwardDirection)
-  }
-  if (!nextNode && root.host) { // pop out of the shadow DOM
-    return getNextNode(root.host.getRootNode(), root.host, forwardDirection)
-  }
-  return nextNode
-}
-
 function focusNextOrPrevious (event, key) {
-  var activeElement = getActiveElement()
-  var forwardDirection = key === 'ArrowRight'
-  if (shouldIgnoreEvent(activeElement, forwardDirection)) {
+  var activeElement = document.activeElement
+  if (shouldIgnoreEvent(activeElement, key)) {
     return
   }
-  var root = getFocusTrapParent(activeElement) || activeElement.getRootNode()
-  var nextNode = getNextNode(root, activeElement, forwardDirection)
-  if (nextNode && nextNode !== activeElement) {
-    nextNode.focus()
-    event.preventDefault()
+  var focusableElements = getFocusableElements(activeElement)
+  if (!focusableElements.length) {
+    return
   }
+  var index = focusableElements.indexOf(activeElement)
+  var element
+  if (key === 'ArrowLeft') {
+    element = focusableElements[index - 1] || focusableElements[0]
+  } else { // ArrowRight
+    element = focusableElements[index + 1] || focusableElements[focusableElements.length - 1]
+  }
+  element.focus()
+  event.preventDefault()
 }
 
 function handleEnter (event) {
-  var activeElement = getActiveElement()
+  var activeElement = document.activeElement
   if (activeElement.tagName === 'INPUT' &&
     checkboxRadioInputTypes.indexOf(activeElement.getAttribute('type').toLowerCase()) !== -1) {
     // Explicitly override "enter" on an input and make it fire the checkbox/radio
