@@ -20,8 +20,8 @@
     "lint:fix": "tslint --fix ./src/**/* && standard --fix ./test",
     "build": "pika-pack",
     "prepare": "npm run build",
-    "test": "mocha ./test/test.js",
-    "cover": "nyc --reporter=html --reporter=json --reporter=lcov npm run test"
+    "test": "karma start --single-run",
+    "test:debug": "karma start --browsers=Chrome --single-run=false"
   },
   "@pika/pack": {
     "pipeline": [
@@ -48,11 +48,21 @@
     "@pika/plugin-build-umd": "^0.7.1",
     "@pika/plugin-build-web": "^0.7.1",
     "@pika/plugin-ts-standard-pkg": "^0.7.1",
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^8.0.1",
     "assert": "^2.0.0",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
+    "karma": "^5.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-mocha": "^2.0.1",
+    "karma-rollup-preprocessor": "^7.0.5",
+    "karma-webpack-preprocessor": "^1.0.1",
     "mocha": "^6.2.3",
     "nyc": "^15.1.0",
+    "rollup": "^2.17.1",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "standard": "^14.3.4",
     "tslint": "^5.20.1",
     "tslint-config-standard": "^8.0.1",
