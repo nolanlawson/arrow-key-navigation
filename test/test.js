@@ -34,26 +34,47 @@ function isTextInput (element) {
   const isTextInput = tagName === 'INPUT' &&
     ['text', 'search', 'url', 'password', 'tel'].indexOf(
       element.getAttribute('type').toLowerCase()) !== -1
-  const isContentEditable = element.hasAttribute('contenteditable')
-  return isTextarea || isTextInput || isContentEditable
+  return isTextarea || isTextInput
+}
+
+function isContentEditable (element) {
+  return element.hasAttribute('contenteditable')
 }
 
 // simulate normal behavior when keydown/keyup happens, such as moving the cursor left/right in an input
 function onKeyDownAfter (e) {
-  if (!oldActiveElement || !isTextInput(oldActiveElement)) {
+  if (!oldActiveElement || !(isTextInput(oldActiveElement) || isContentEditable(oldActiveElement))) {
     return
   }
-  const selectionStart = oldActiveElement.selectionStart
-  const len = oldActiveElement.value.length
-  if (e.key === 'ArrowLeft') {
-    if (selectionStart > 0) {
-      oldActiveElement.selectionStart--
-      oldActiveElement.selectionEnd--
+  if (isTextInput(oldActiveElement)) {
+    const selectionStart = oldActiveElement.selectionStart
+    const len = oldActiveElement.value.length
+    if (e.key === 'ArrowLeft') {
+      if (selectionStart > 0) {
+        oldActiveElement.selectionStart--
+        oldActiveElement.selectionEnd--
+      }
+    } else if (e.key === 'ArrowRight') {
+      if (oldActiveElement.selectionEnd < len) {
+        oldActiveElement.selectionEnd++
+        oldActiveElement.selectionStart++
+      }
     }
-  } else if (e.key === 'ArrowRight') {
-    if (oldActiveElement.selectionEnd < len) {
-      oldActiveElement.selectionEnd++
-      oldActiveElement.selectionStart++
+  } else { // contenteditable
+    const selection = getSelection()
+    const range = selection.getRangeAt(0)
+    const { startContainer, startOffset, endContainer, endOffset } = range
+    const len = startContainer.length
+    if (e.key === 'ArrowLeft') {
+      if (startOffset > 0) {
+        range.setStart(startContainer, startOffset - 1)
+        range.setEnd(endContainer, endOffset - 1)
+      }
+    } else if (e.key === 'ArrowRight') {
+      if (endOffset < len) {
+        range.setStart(startContainer, startOffset + 1)
+        range.setEnd(endContainer, endOffset + 1)
+      }
     }
   }
 }
@@ -204,12 +225,14 @@ describe('test suite', () => {
       assertActiveClass(['button-1'])
     })
 
-    // TODO: can't actually test contenteditable in jsdom: https://github.com/jsdom/jsdom/issues/2472
-    it.skip('handles contenteditable correctly', () => {
+    it('handles contenteditable correctly', () => {
       document.body.innerHTML = `<div class=container>
+       <button class="button"></button>
         <div class="editable" contenteditable>hi</div>
         <input type="text" class="input">
       </div>`
+      typeRight()
+      assertActiveClass(['button'])
       typeRight()
       assertActiveClass(['editable'])
       typeRight()
@@ -218,6 +241,10 @@ describe('test suite', () => {
       assertActiveClass(['editable'])
       typeRight()
       assertActiveClass(['input'])
+      typeLeft()
+      assertActiveClass(['editable'])
+      typeLeft()
+      assertActiveClass(['button'])
     })
 
     it('handles details/summary correctly', () => {
@@ -243,7 +270,7 @@ describe('test suite', () => {
       assert.deepStrictEqual(document.activeElement.constructor.name, 'HTMLBodyElement');
     })
 
-    it.skip('handles element becoming disabled while focused', () => {
+    it('handles element becoming disabled while focused', () => {
       // if a button is disabled when it's focused (for whatever reason), then the left/right
       // focus should still change to the proper element to its left/right
       document.body.innerHTML = `<div class="container">
@@ -257,14 +284,14 @@ describe('test suite', () => {
       assertActiveClass(['button-2'])
       $('.button-2').disabled = true
       typeRight()
-      assertActiveClass(['button-3'])
+      assertActiveClass(['button-1'])
       typeLeft()
       assertActiveClass(['button-1'])
       $('.button-2').disabled = false
       typeRight()
       assertActiveClass(['button-2'])
       $('.button-2').disabled = true
-      typeLeft()
+      typeRight()
       assertActiveClass(['button-1'])
     })
   })
