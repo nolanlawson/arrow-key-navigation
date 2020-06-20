@@ -11,7 +11,7 @@ The basic idea is to make the <kbd>←</kbd> and <kbd>→</kbd> keys act similar
 Since the <kbd>↑</kbd> and <kbd>↓</kbd> keys typically scroll the page in KaiOS, this is usually all you need
 to add basic KaiOS accessibility to an existing web app.
 
-It will also listen for the <kbd>Enter</kbd> key for certain special cases like checkbox/radio buttons. `contenteditable` and Shadow DOM are also supported.
+It will also listen for the <kbd>Enter</kbd> key for certain special cases like checkbox/radio buttons.
 
 ## Install
 
