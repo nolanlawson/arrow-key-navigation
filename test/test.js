@@ -341,11 +341,12 @@ describe('test suite', () => {
   })
 
   describe('shadow dom', () => {
-    it('works with shadow dom', () => {
+
+    before(() => {
       class Component extends HTMLElement {
-        constructor() {
+        constructor () {
           super()
-          this.attachShadow({ mode: 'open'})
+          this.attachShadow({ mode: 'open' })
           this.shadowRoot.innerHTML = `
             <button class="inside-shadow-button-1">
             <input type=text class="inside-shadow-text" value='hi'>
@@ -354,48 +355,11 @@ describe('test suite', () => {
           this.classList.add('my-component')
         }
       }
-      customElements.define('my-component', Component)
 
-      document.body.innerHTML = `
-        <button class="button-1">one</button>
-        <my-component></my-component>
-        <button class="button-2">two</button>
-      `
-      typeRight()
-      assertActiveClass(['button-1'])
-      typeRight()
-      assertActiveClass(['my-component'])
-      assertShadowActiveClass(['inside-shadow-button-1'])
-      typeRight()
-      assertShadowActiveClass(['inside-shadow-text'])
-      typeRight()
-      assertShadowActiveClass(['inside-shadow-text'])
-      typeRight()
-      assertShadowActiveClass(['inside-shadow-text'])
-      typeRight()
-      assertShadowActiveClass(['inside-shadow-button-2'])
-      typeRight()
-      assertActiveClass(['button-2'])
-      typeLeft()
-      assertActiveClass(['my-component'])
-      assertShadowActiveClass(['inside-shadow-button-2'])
-      typeLeft()
-      assertShadowActiveClass(['inside-shadow-text'])
-      typeLeft()
-      assertShadowActiveClass(['inside-shadow-text'])
-      typeLeft()
-      assertShadowActiveClass(['inside-shadow-text'])
-      typeLeft()
-      assertShadowActiveClass(['inside-shadow-button-1'])
-      typeLeft()
-      assertActiveClass(['button-1'])
-    })
-
-    it('works with shadow dom inside shadow dom', () => {
       class Component2 extends HTMLElement {
-        constructor() {
+        constructor () {
           super()
-          this.attachShadow({ mode: 'open'})
+          this.attachShadow({ mode: 'open' })
           this.shadowRoot.innerHTML = `
             <span>not focusable</span>
             <my-component-3></my-component-3>
@@ -406,9 +370,9 @@ describe('test suite', () => {
       }
 
       class Component3 extends HTMLElement {
-        constructor() {
+        constructor () {
           super()
-          this.attachShadow({ mode: 'open'})
+          this.attachShadow({ mode: 'open' })
           this.shadowRoot.innerHTML = `
             <span>not focusable</span>
             <button class="inside-shadow-button">button</button>
@@ -418,33 +382,10 @@ describe('test suite', () => {
         }
       }
 
-      customElements.define('my-component-2', Component2)
-      customElements.define('my-component-3', Component3)
-
-      document.body.innerHTML = `
-        <button class="button-1">one</button>
-        <my-component-2></my-component-2>
-        <button class="button-2">two</button>
-      `
-      typeRight()
-      assertActiveClass(['button-1'])
-      typeRight()
-      assertActiveClass(['my-component-2'])
-      assertShadowActiveClass(['inside-shadow-button'])
-      typeRight()
-      assertActiveClass(['button-2'])
-      typeLeft()
-      assertActiveClass(['my-component-2'])
-      assertShadowActiveClass(['inside-shadow-button'])
-      typeLeft()
-      assertActiveClass(['button-1'])
-    })
-
-    it('works with shadow dom inside shadow dom 2', () => {
       class Component4 extends HTMLElement {
-        constructor() {
+        constructor () {
           super()
-          this.attachShadow({ mode: 'open'})
+          this.attachShadow({ mode: 'open' })
           this.shadowRoot.innerHTML = `
             <my-component-5></my-component-5>
           `
@@ -453,9 +394,9 @@ describe('test suite', () => {
       }
 
       class Component5 extends HTMLElement {
-        constructor() {
+        constructor () {
           super()
-          this.attachShadow({ mode: 'open'})
+          this.attachShadow({ mode: 'open' })
           this.shadowRoot.innerHTML = `
             <button class="inside-shadow-button">button</button>
           `
@@ -463,26 +404,106 @@ describe('test suite', () => {
         }
       }
 
+      customElements.define('my-component', Component)
+      customElements.define('my-component-2', Component2)
+      customElements.define('my-component-3', Component3)
       customElements.define('my-component-4', Component4)
       customElements.define('my-component-5', Component5)
+    })
 
-      document.body.innerHTML = `
+    const polyFillTypes = [false, true]
+    polyFillTypes.forEach(isPolyfill => {
+      describe(`polyfilled: ${isPolyfill}`, () => {
+
+        before(() => {
+          if (isPolyfill) {
+            // hack to opt our code into the polyfill mode (not really polyfilled)
+            ShadowRoot.polyfill = true
+          }
+        })
+
+        after(() => {
+          if (isPolyfill) {
+            delete ShadowRoot.polyfill
+          }
+        })
+
+        it('works with shadow dom', () => {
+          document.body.innerHTML = `
+        <button class="button-1">one</button>
+        <my-component></my-component>
+        <button class="button-2">two</button>
+      `
+          typeRight()
+          assertActiveClass(['button-1'])
+          typeRight()
+          assertActiveClass(['my-component'])
+          assertShadowActiveClass(['inside-shadow-button-1'])
+          typeRight()
+          assertShadowActiveClass(['inside-shadow-text'])
+          typeRight()
+          assertShadowActiveClass(['inside-shadow-text'])
+          typeRight()
+          assertShadowActiveClass(['inside-shadow-text'])
+          typeRight()
+          assertShadowActiveClass(['inside-shadow-button-2'])
+          typeRight()
+          assertActiveClass(['button-2'])
+          typeLeft()
+          assertActiveClass(['my-component'])
+          assertShadowActiveClass(['inside-shadow-button-2'])
+          typeLeft()
+          assertShadowActiveClass(['inside-shadow-text'])
+          typeLeft()
+          assertShadowActiveClass(['inside-shadow-text'])
+          typeLeft()
+          assertShadowActiveClass(['inside-shadow-text'])
+          typeLeft()
+          assertShadowActiveClass(['inside-shadow-button-1'])
+          typeLeft()
+          assertActiveClass(['button-1'])
+        })
+
+        it('works with shadow dom inside shadow dom', () => {
+          document.body.innerHTML = `
+        <button class="button-1">one</button>
+        <my-component-2></my-component-2>
+        <button class="button-2">two</button>
+      `
+          typeRight()
+          assertActiveClass(['button-1'])
+          typeRight()
+          assertActiveClass(['my-component-2'])
+          assertShadowActiveClass(['inside-shadow-button'])
+          typeRight()
+          assertActiveClass(['button-2'])
+          typeLeft()
+          assertActiveClass(['my-component-2'])
+          assertShadowActiveClass(['inside-shadow-button'])
+          typeLeft()
+          assertActiveClass(['button-1'])
+        })
+
+        it('works with shadow dom inside shadow dom 2', () => {
+          document.body.innerHTML = `
         <button class="button-1">one</button>
         <my-component-4></my-component-4>
         <button class="button-2">two</button>
       `
-      typeRight()
-      assertActiveClass(['button-1'])
-      typeRight()
-      assertActiveClass(['my-component-4'])
-      assertShadowActiveClass(['inside-shadow-button'])
-      typeRight()
-      assertActiveClass(['button-2'])
-      typeLeft()
-      assertActiveClass(['my-component-4'])
-      assertShadowActiveClass(['inside-shadow-button'])
-      typeLeft()
-      assertActiveClass(['button-1'])
+          typeRight()
+          assertActiveClass(['button-1'])
+          typeRight()
+          assertActiveClass(['my-component-4'])
+          assertShadowActiveClass(['inside-shadow-button'])
+          typeRight()
+          assertActiveClass(['button-2'])
+          typeLeft()
+          assertActiveClass(['my-component-4'])
+          assertShadowActiveClass(['inside-shadow-button'])
+          typeLeft()
+          assertActiveClass(['button-1'])
+        })
+      })
     })
   })
 })

@@ -86,33 +86,69 @@ function shouldIgnoreEvent (activeElement, forwardDirection) {
   return true
 }
 
-function getNextNode (root, targetElement, forwardDirection): HTMLElement {
-  var filter: NodeFilter = {
-    acceptNode: function (node: HTMLElement) {
-      var accept = (node === targetElement || node.shadowRoot || isFocusable(node))
-      return accept ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+function getNextCandidateNodeForShadowDomPolyfill (root, targetElement, forwardDirection, filter): HTMLElement {
+  // When the shadydom polyfill is running, we can't use TreeWalker on ShadowRoots because
+  // they aren't real Nodes. So we do this workaround where we run TreeWalker on the
+  // children instead.
+  var nodes = Array.prototype.slice.call(root.querySelectorAll('*'))
+  var idx = nodes.indexOf(targetElement)
+  if (forwardDirection) {
+    nodes = nodes.slice(idx + 1)
+  } else {
+    if (idx === -1) {
+      idx = nodes.length
+    }
+    nodes = nodes.slice(0, idx)
+    nodes.reverse()
+  }
+  for (var i = 0; i < nodes.length; i++) {
+    var node = nodes[i]
+    if (node instanceof HTMLElement && filter.acceptNode(node) === NodeFilter.FILTER_ACCEPT) {
+      return node
     }
   }
-  var walker: TreeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filter)
+  return undefined
+}
+
+function getNextCandidateNode (root, targetElement, forwardDirection, filter): HTMLElement {
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filter)
   if (targetElement) {
     walker.currentNode = targetElement
   }
-
-  var nextNode: HTMLElement
-
   if (forwardDirection) {
-    nextNode = walker.nextNode() as HTMLElement
+    return walker.nextNode() as HTMLElement
   } else if (targetElement) {
-    nextNode = walker.previousNode() as HTMLElement
-  } else { // iterating backwards through shadow root, use last child
-    nextNode = walker.lastChild() as HTMLElement
+    return walker.previousNode() as HTMLElement
   }
+  // iterating backwards through shadow root, use last child
+  return walker.lastChild() as HTMLElement
+}
+
+function isShadowDomPolyfill () {
+  return typeof ShadowRoot !== 'undefined' &&
+      // ShadowRoot.polyfill is just a hack for our unit tests
+      ('polyfill' in ShadowRoot || !ShadowRoot.toString().includes('[native code]'))
+}
+
+function getNextNode (root, targetElement, forwardDirection): HTMLElement {
+  var filter: NodeFilter = {
+    acceptNode: function (node: HTMLElement) {
+      return (node === targetElement || node.shadowRoot || isFocusable(node))
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_SKIP
+    }
+  }
+
+  // TODO: remove this when we don't need to support the Shadow DOM polyfill
+  var nextNode = isShadowDomPolyfill() && root instanceof ShadowRoot
+    ? getNextCandidateNodeForShadowDomPolyfill(root, targetElement, forwardDirection, filter)
+    : getNextCandidateNode(root, targetElement, forwardDirection, filter)
 
   if (nextNode && nextNode.shadowRoot) { // push into the shadow DOM
     return getNextNode(nextNode.shadowRoot, null, forwardDirection)
   }
-  if (!nextNode && root.host) { // pop out of the shadow DOM
-    return getNextNode(root.host.getRootNode(), root.host, forwardDirection)
+  if (!nextNode && (root as ShadowRoot).host) { // pop out of the shadow DOM
+    return getNextNode((root as ShadowRoot).host.getRootNode(), (root as ShadowRoot).host, forwardDirection)
   }
   return nextNode
 }
