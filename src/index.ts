@@ -86,12 +86,45 @@ function shouldIgnoreEvent (activeElement, forwardDirection) {
   return true
 }
 
+function isSelfOrAncestor(node, ancestor) {
+  var parent = node
+  while (parent) {
+    if (parent === ancestor) {
+      return true
+    }
+    parent = parent.parentElement
+  }
+  return false
+}
+
 function getNextNode (root, targetElement, forwardDirection): HTMLElement {
   var filter: NodeFilter = {
     acceptNode: function (node: HTMLElement) {
       var accept = (node === targetElement || node.shadowRoot || isFocusable(node))
       return accept ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
     }
+  }
+  if (typeof ShadowRoot !== 'undefined' &&
+      !ShadowRoot.toString().includes('[native code]') &&
+      root instanceof ShadowRoot) { // shadow DOM polyfill, do a workaround
+    var nodes = Array.prototype.slice.call(root.querySelectorAll('*'))
+    var idx = nodes.indexOf(targetElement)
+    if (forwardDirection) {
+      nodes = nodes.slice(idx + 1)
+    } else {
+      if (idx === -1) {
+        idx = nodes.length
+      }
+      nodes = nodes.slice(0, idx)
+      nodes.reverse()
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i]
+      if (node instanceof HTMLElement && filter.acceptNode(node)) {
+        return node
+      }
+    }
+    return undefined
   }
   var walker: TreeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filter)
   if (targetElement) {
@@ -111,8 +144,8 @@ function getNextNode (root, targetElement, forwardDirection): HTMLElement {
   if (nextNode && nextNode.shadowRoot) { // push into the shadow DOM
     return getNextNode(nextNode.shadowRoot, null, forwardDirection)
   }
-  if (!nextNode && root.host) { // pop out of the shadow DOM
-    return getNextNode(root.host.getRootNode(), root.host, forwardDirection)
+  if (!nextNode && (root as ShadowRoot).host) { // pop out of the shadow DOM
+    return getNextNode((root as ShadowRoot).host.getRootNode(), (root as ShadowRoot).host, forwardDirection)
   }
   return nextNode
 }
