@@ -60,7 +60,6 @@
     "karma-coverage": "^2.0.2",
     "karma-mocha": "^2.0.1",
     "karma-rollup-preprocessor": "^7.0.5",
-    "karma-webpack-preprocessor": "^1.0.1",
     "mocha": "^6.2.3",
     "nyc": "^15.1.0",
     "rollup": "^2.17.1",
